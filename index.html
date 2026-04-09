@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission Lynx</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Courier New", monospace;
+      background: linear-gradient(180deg, #111 0%, #1b1b1b 100%);
+      color: white;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 760px;
+      padding: 30px;
+      background: #1b1b1b;
+      border: 2px solid #7b5d31;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #75b6ff;
+      letter-spacing: 2px;
+    }
+
+    h2 { margin-top: 0; }
+
+    p { line-height: 1.6; }
+
+    button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover { background: #555; }
+
+    .final-box {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #241f19;
+      line-height: 1.8;
+      border: 1px solid rgba(183,154,101,0.22);
+    }
+
+    .success {
+      color: #9ecaff;
+      font-weight: bold;
+      font-size: 22px;
+    }
+
+    .fail {
+      color: #ff8d8d;
+      font-weight: bold;
+      font-size: 22px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>MISSION LYNX</h1>
+  <div id="quiz"></div>
+</div>
+
+<audio id="good" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+<audio id="bad" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+<script>
+
+const questions = [
+  {
+    q: "Quels sont les noms des 3 héros ?",
+    a: [
+      "Esther, Léo et Marius",
+      "Lisa, Eusèbe et Louis",
+      "Monica, Martin et François",
+      "Lisa, Eusèbe et François"
+    ],
+    correct: 3
+  },
+  {
+    q: "Dans quel pays se passe l'histoire ?",
+    a: [
+      "France",
+      "Angleterre",
+      "Allemagne",
+      "Espagne"
+    ],
+    correct: 0
+  },
+  {
+    q: "Comment s'appelle le réseau créé par les enfants ?",
+    a: [
+      "Le Faucon",
+      "Le Lynx",
+      "Le Hibou",
+      "Le Renard"
+    ],
+    correct: 1
+  },
+  {
+    q: "Comment s'appelle le village ?",
+    a: [
+      "Pontain-l'Écluse",
+      "Montfermeil",
+      "Val-des-Bois",
+      "Saint-Rémy"
+    ],
+    correct: 0
+  },
+  {
+    q: "Quel personnage est d'origine allemande ?",
+    a: [
+      "François",
+      "Eusèbe",
+      "Lisa",
+      "Le père de François"
+    ],
+    correct: 2
+  },
+  {
+    q: "Quel personnage est abattu par les Allemands ?",
+    a: [
+      "Le maire",
+      "François",
+      "Eusèbe",
+      "Jules"
+    ],
+    correct: 1
+  },
+  {
+    q: "Qu'est-ce que les enfants ont cassé pour inonder le village ?",
+    a: [
+      "Des bouteilles",
+      "Un barrage hydraulique",
+      "La canalisation",
+      "Le pont"
+    ],
+    correct: 2
+  },
+  {
+    q: "Qui collabore avec les Allemands ?",
+    a: [
+      "Le patron du bar",
+      "L'instituteur",
+      "Le facteur",
+      "Le médecin"
+    ],
+    correct: 2
+  },
+  {
+    q: "Quel est le métier du père d’Eusèbe ?",
+    a: [
+      "Médecin",
+      "Instituteur",
+      "Agriculteur",
+      "Gendarme"
+    ],
+    correct: 1
+  }
+];
+
+let current = 0;
+let score = 0;
+
+function showQuestion() {
+  const q = questions[current];
+
+  document.getElementById("quiz").innerHTML = `
+    <h2>Question ${current + 1}/${questions.length}</h2>
+    <p>${q.q}</p>
+    ${q.a.map((choice, i) => `
+      <button onclick="answer(${i})">${choice}</button>
+    `).join("")}
+  `;
+}
+
+function answer(i) {
+  if (i === questions[current].correct) {
+    playSound("good");
+    score++;
+  } else {
+    playSound("bad");
+  }
+
+  current++;
+
+  setTimeout(() => {
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      endQuiz();
+    }
+  }, 200);
+}
+
+function endQuiz() {
+  if (score >= 7) {
+    document.getElementById("quiz").innerHTML = `
+      <div class="final-box">
+        <div class="success">Mission validée</div>
+        <p>Vous avez trouvé les bonnes réponses.</p>
+        <p>Allez voir votre chef d'équipe sous le hangar.</p>
+      </div>
+    `;
+  } else {
+    document.getElementById("quiz").innerHTML = `
+      <div class="final-box">
+        <div class="fail">Échec de la mission</div>
+        <p>Vous n’avez pas obtenu assez de bonnes réponses.</p>
+        <button onclick="restartQuiz()">Recommencer</button>
+      </div>
+    `;
+  }
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  showQuestion();
+}
+
+function playSound(id) {
+  const sound = document.getElementById(id);
+  if (!sound) return;
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
+}
+
+showQuestion();
+
+</script>
+
+</body>
+</html>
