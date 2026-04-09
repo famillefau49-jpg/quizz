@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mission Lynx</title>
-
   <style>
     * { box-sizing: border-box; }
 
@@ -37,11 +36,15 @@
       letter-spacing: 2px;
     }
 
-    h2 { margin-top: 0; }
+    h2 {
+      margin-top: 0;
+    }
 
-    p { line-height: 1.6; }
+    p {
+      line-height: 1.6;
+    }
 
-    button {
+    .answer-btn {
       display: block;
       width: 100%;
       margin-top: 10px;
@@ -52,9 +55,27 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
+      transition: 0.2s ease;
     }
 
-    button:hover { background: #555; }
+    .answer-btn:hover {
+      background: #555;
+    }
+
+    .answer-btn.correct {
+      background: #1f8b4c;
+      box-shadow: 0 0 12px rgba(80, 255, 140, 0.45);
+    }
+
+    .answer-btn.wrong {
+      background: #9b2d2d;
+      box-shadow: 0 0 12px rgba(255, 90, 90, 0.45);
+    }
+
+    .answer-btn:disabled {
+      cursor: default;
+      opacity: 1;
+    }
 
     .final-box {
       margin-top: 20px;
@@ -78,182 +99,195 @@
     }
   </style>
 </head>
-
 <body>
 
-<div class="card">
-  <h1>MISSION LYNX</h1>
-  <div id="quiz"></div>
-</div>
+  <div class="card">
+    <h1>MISSION LYNX</h1>
+    <div id="quiz"></div>
+  </div>
 
-<audio id="good" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
-<audio id="bad" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+  <audio id="good" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+  <audio id="bad" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
 
-<script>
+  <script>
+    const questions = [
+      {
+        q: "Quels sont les noms des 3 héros ?",
+        a: [
+          "Esther, Léo et Marius",
+          "Lisa, Eusèbe et Louis",
+          "Monica, Martin et François",
+          "Lisa, Eusèbe et François"
+        ],
+        correct: 3
+      },
+      {
+        q: "Dans quel pays se passe l'histoire ?",
+        a: [
+          "France",
+          "Angleterre",
+          "Allemagne",
+          "Espagne"
+        ],
+        correct: 0
+      },
+      {
+        q: "Comment s'appelle le réseau créé par les enfants ?",
+        a: [
+          "Le Faucon",
+          "Le Lynx",
+          "Le Hibou",
+          "Le Renard"
+        ],
+        correct: 1
+      },
+      {
+        q: "Comment s'appelle le village ?",
+        a: [
+          "Pontain-l'Écluse",
+          "Montfermeil",
+          "Val-des-Bois",
+          "Saint-Rémy"
+        ],
+        correct: 0
+      },
+      {
+        q: "Quel personnage est d'origine allemande ?",
+        a: [
+          "François",
+          "Eusèbe",
+          "Lisa",
+          "Le père de François"
+        ],
+        correct: 2
+      },
+      {
+        q: "Quel personnage est abattu par les Allemands ?",
+        a: [
+          "Le maire",
+          "François",
+          "Eusèbe",
+          "Jules"
+        ],
+        correct: 1
+      },
+      {
+        q: "Qu'est-ce que les enfants ont cassé pour inonder le village ?",
+        a: [
+          "Des bouteilles",
+          "Un barrage hydraulique",
+          "La canalisation",
+          "Le pont"
+        ],
+        correct: 2
+      },
+      {
+        q: "Qui collabore avec les Allemands ?",
+        a: [
+          "Le patron du bar",
+          "L'instituteur",
+          "Le facteur",
+          "Le médecin"
+        ],
+        correct: 0
+      },
+      {
+        q: "Quel est le métier du père d’Eusèbe ?",
+        a: [
+          "Médecin",
+          "Instituteur",
+          "Agriculteur",
+          "Gendarme"
+        ],
+        correct: 1
+      }
+    ];
 
-const questions = [
-  {
-    q: "Quels sont les noms des 3 héros ?",
-    a: [
-      "Esther, Léo et Marius",
-      "Lisa, Eusèbe et Louis",
-      "Monica, Martin et François",
-      "Lisa, Eusèbe et François"
-    ],
-    correct: 3
-  },
-  {
-    q: "Dans quel pays se passe l'histoire ?",
-    a: [
-      "France",
-      "Angleterre",
-      "Allemagne",
-      "Espagne"
-    ],
-    correct: 0
-  },
-  {
-    q: "Comment s'appelle le réseau créé par les enfants ?",
-    a: [
-      "Le Faucon",
-      "Le Lynx",
-      "Le Hibou",
-      "Le Renard"
-    ],
-    correct: 1
-  },
-  {
-    q: "Comment s'appelle le village ?",
-    a: [
-      "Pontain-l'Écluse",
-      "Montfermeil",
-      "Val-des-Bois",
-      "Saint-Rémy"
-    ],
-    correct: 0
-  },
-  {
-    q: "Quel personnage est d'origine allemande ?",
-    a: [
-      "François",
-      "Eusèbe",
-      "Lisa",
-      "Le père de François"
-    ],
-    correct: 2
-  },
-  {
-    q: "Quel personnage est abattu par les Allemands ?",
-    a: [
-      "Le maire",
-      "François",
-      "Eusèbe",
-      "Jules"
-    ],
-    correct: 1
-  },
-  {
-    q: "Qu'est-ce que les enfants ont cassé pour inonder le village ?",
-    a: [
-      "Des bouteilles",
-      "Un barrage hydraulique",
-      "La canalisation",
-      "Le pont"
-    ],
-    correct: 2
-  },
-  {
-    q: "Qui collabore avec les Allemands ?",
-    a: [
-      "Le patron du bar",
-      "L'instituteur",
-      "Le facteur",
-      "Le médecin"
-    ],
-    correct: 2
-  },
-  {
-    q: "Quel est le métier du père d’Eusèbe ?",
-    a: [
-      "Médecin",
-      "Instituteur",
-      "Agriculteur",
-      "Gendarme"
-    ],
-    correct: 1
-  }
-];
+    let current = 0;
+    let locked = false;
 
-let current = 0;
-let score = 0;
+    function showQuestion() {
+      const q = questions[current];
 
-function showQuestion() {
-  const q = questions[current];
-
-  document.getElementById("quiz").innerHTML = `
-    <h2>Question ${current + 1}/${questions.length}</h2>
-    <p>${q.q}</p>
-    ${q.a.map((choice, i) => `
-      <button onclick="answer(${i})">${choice}</button>
-    `).join("")}
-  `;
-}
-
-function answer(i) {
-  if (i === questions[current].correct) {
-    playSound("good");
-    score++;
-  } else {
-    playSound("bad");
-  }
-
-  current++;
-
-  setTimeout(() => {
-    if (current < questions.length) {
-      showQuestion();
-    } else {
-      endQuiz();
+      document.getElementById("quiz").innerHTML = `
+        <h2>Question ${current + 1}/${questions.length}</h2>
+        <p>${q.q}</p>
+        ${q.a.map((choice, i) => `
+          <button class="answer-btn" data-index="${i}" onclick="answer(${i})">${choice}</button>
+        `).join("")}
+      `;
     }
-  }, 200);
-}
 
-function endQuiz() {
-  if (score >= 7) {
-    document.getElementById("quiz").innerHTML = `
-      <div class="final-box">
-        <div class="success">Mission validée</div>
-        <p>Vous avez trouvé les bonnes réponses.</p>
-        <p>Allez voir votre chef d'équipe sous le hangar.</p>
-      </div>
-    `;
-  } else {
-    document.getElementById("quiz").innerHTML = `
-      <div class="final-box">
-        <div class="fail">Échec de la mission</div>
-        <p>Vous n’avez pas obtenu assez de bonnes réponses.</p>
-        <button onclick="restartQuiz()">Recommencer</button>
-      </div>
-    `;
-  }
-}
+    function answer(i) {
+      if (locked) return;
+      locked = true;
 
-function restartQuiz() {
-  current = 0;
-  score = 0;
-  showQuestion();
-}
+      const q = questions[current];
+      const buttons = document.querySelectorAll(".answer-btn");
 
-function playSound(id) {
-  const sound = document.getElementById(id);
-  if (!sound) return;
-  sound.currentTime = 0;
-  sound.play().catch(() => {});
-}
+      buttons.forEach(btn => btn.disabled = true);
 
-showQuestion();
+      if (i === q.correct) {
+        buttons[i].classList.add("correct");
+        playSound("good");
 
-</script>
+        setTimeout(() => {
+          current++;
+          if (current < questions.length) {
+            showQuestion();
+            locked = false;
+          } else {
+            endQuiz();
+          }
+        }, 700);
+
+      } else {
+        buttons[i].classList.add("wrong");
+        buttons[q.correct].classList.add("correct");
+        playSound("bad");
+
+        setTimeout(() => {
+          document.getElementById("quiz").innerHTML = `
+            <div class="final-box">
+              <div class="fail">Mauvaise réponse</div>
+              <p>Mission compromise.</p>
+              <p>Retour au début...</p>
+            </div>
+          `;
+        }, 700);
+
+        setTimeout(() => {
+          restartQuiz();
+          locked = false;
+        }, 1800);
+      }
+    }
+
+    function endQuiz() {
+      document.getElementById("quiz").innerHTML = `
+        <div class="final-box">
+          <div class="success">Mission validée</div>
+          <p>Vous avez trouvé toutes les bonnes réponses.</p>
+          <p>Allez voir votre chef d'équipe sous le hangar.</p>
+        </div>
+      `;
+    }
+
+    function restartQuiz() {
+      current = 0;
+      showQuestion();
+    }
+
+    function playSound(id) {
+      const sound = document.getElementById(id);
+      if (!sound) return;
+      sound.pause();
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    showQuestion();
+  </script>
 
 </body>
 </html>
